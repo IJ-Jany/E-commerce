@@ -20,8 +20,7 @@ const userSchema =  new Schema({
         select:false
      },
      phoneNumber:{
-        type:String,
-        unique:true
+        type:String
      },
      emailVerified:{
         type:Date,
@@ -32,7 +31,8 @@ const userSchema =  new Schema({
      role:{
         type:String,
         lowercase:true,
-        enum:["user", "seller","admin", "editor"]
+        enum:["user", "seller","admin", "editor"],
+        default: "user"
      },
      address:[
         {street:String}, {postalCode:String}, {district:String}, {
