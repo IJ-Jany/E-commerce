@@ -3,6 +3,8 @@
  import { mail } from "../utils/sendMail.js"
 import { verificationTemplate } from "../mailTemp/verificationTemplate.js"
 import { cloudinaryUpload } from "../services/cloudinary.js"
+import ApiResponse from "../utils/ApiResponse.js"
+import response from "../utils/ApiResponse.js"
 
 const generateTokens = async (id) => {
     try {
@@ -81,10 +83,13 @@ const  login = async(req,res)=>{
             if (!isPasswordCorrect) {
                 return res.send("email and password wrong")
             }
+            if(!userFound.emailVerified){
+             return res.send("email not verified, please check your mailbox")
+            }
             const { accessToken, refreshToken } = await generateTokens(userFound.
                 _id
             )
-            return res.json({ accessToken, refreshToken})
+            return res.json(apiLoginResponse(200, "login", { accessToken, refreshToken}))
     } catch (error) {
        console.log(error);
        
@@ -92,14 +97,33 @@ const  login = async(req,res)=>{
    
 }
 
-const userUpdate = async (req,res) =>{
+const userUpdate = async (req,res) =>{ 
+    try {
 if(req.file){
     const {path } = req.file
-    const result = await cloudinaryUpload(path, "a user", "profilePic")
-     
-  res.json("okk")
+    const user = await User.findById(req.user._id)
+    if(user){
+        const result = await cloudinaryUpload(path, user.displayname, "profilePic")
+        user.profilePic = result.optimizeUrl
+        user.public_id = result.uploadResult.public_id 
+        await user.save()
+        res.json(apiResponse(200, "avatar uploaded",{user}))
+    }
 }
+    } catch (error) {
+      console.log(error);
+         
+    }
     
 }
+const logout = async (req,res) => {
+    try {
+        const user = await user.findById(req.user.id)
+        user.refreshToken = null
+        await user.save()
+    } catch (error) {
+        console.log(error)
+    }
+}
 
-export {createUser,emailVerify, login, userUpdate}
+export {createUser,emailVerify, login, logout, userUpdate}

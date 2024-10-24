@@ -31,6 +31,9 @@ const userSchema =  new Schema({
      resetPasswrdToken:{
         type:String,
      },
+     public_id:{
+      type: String
+     },
      role:{
         type:String,
         lowercase:true,
@@ -64,7 +67,8 @@ userSchema.methods.generateAccessToken = async function () {
  return  jwt.sign({
       id:this._id,
       email:this.email,
-      displayName : this.displayName
+      displayName : this.displayName,
+      role:this.role
     }, process.env.ACCESS_TOKEN_SC, { expiresIn: process.env.ACCESS_TOKEN_EX });
 }
 
@@ -72,7 +76,8 @@ userSchema.methods.generateRefreshToken = async function () {
    return  jwt.sign({
         id:this._id,
         email:this.email,
-        displayName : this.displayName
+        displayName : this.displayName,
+        role:this.role
       }, process.env.REFRESH_TOKEN_SC, { expiresIn: process.env.REFRESH_TOKEN_EX });
   }
 
