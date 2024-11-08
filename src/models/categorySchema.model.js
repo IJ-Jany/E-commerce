@@ -4,12 +4,12 @@ const categorySchema = new Schema({
     name: {
         type: String,
         unique:true,
-        require:true
+        required:true
     },
     slug:{
         type:String,
         unique: true,
-        require:true
+        required:true
     },
     subCategory: {
         type:mongoose.Types.ObjectId,

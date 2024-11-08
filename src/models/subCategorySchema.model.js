@@ -1,6 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 
-const subcategorySchema = new Schema({
+const SubCategorySchema = new Schema({
     name: {
         type: String,
         unique:true,
@@ -17,4 +17,4 @@ const subcategorySchema = new Schema({
     }
 },{timestamps: true})
 
-export const subcategory = mongoose.model("subcategorySchema", subcategorySchema)
+export const SubCategory = mongoose.model("SubCategory", SubCategorySchema)

@@ -4,13 +4,13 @@
 import { verificationTemplate } from "../mailTemp/verificationTemplate.js"
 import { cloudinaryUpload } from "../services/cloudinary.js"
 import ApiResponse from "../utils/ApiResponse.js"
-import response from "../utils/ApiResponse.js"
+import apiResponse from "quick-response"
 
 const generateTokens = async (id) => {
     try {
    const user = await User.findById({ _id:id })
     const accessToken =await user.generateAccessToken()
-    const refreshToken = await user.generaterefreshToken()
+    const refreshToken = await user.generateRefreshToken()
     user.refreshToken = refreshToken
     await user.save()
     return { accessToken, refreshToken}
@@ -24,16 +24,18 @@ console.log(error);
         const {displayname,email,password,phonenumber} = req.body
  const isFound = await  User.findOne({email})
 if (isFound) {
- return  res.json("email done")
+ return  res.send("email already exist")
 }
 const user = await User.create({displayname,password,email,phonenumber})
-const link = await user.generateAccessToken()
+console.log(user);
+
+const link = await user.generateAccessToken(user._id)
 await mail(user.email,"verification","hello",verificationTemplate(link))
- return res.json("ok")
+ return res.send("ok")
  
 } 
  catch (error) {
-       console.log(error);
+       console.log(error.message);
         
     }
 }
@@ -67,29 +69,32 @@ const emailVerify = async (req,res) =>{
 const  login = async(req,res)=>{
     try {
         const {email,password} =req.body 
+        console.log(email,password);
+        
         if (req.body.hasOwnProperty("email") && req.body.hasOwnProperty("password")) {
             if([email,password ].some((field) => field == "")){
                 return res.json("all fields are required")
               }
-           }else{
-        
-        return res.json("invalid")
-           } 
+           }
            const userFound = await User.findOne({ email})
+           console.log(userFound);
+           
            if (!userFound) {
             return res.send("email and password wrong")
            }
+           //const isPasswordCorrect = await userFound.checkPassword(password)
            const isPasswordCorrect = await userFound.checkPassword(password)
+          console.log(isPasswordCorrect);
+           
             if (!isPasswordCorrect) {
                 return res.send("email and password wrong")
             }
             if(!userFound.emailVerified){
              return res.send("email not verified, please check your mailbox")
             }
-            const { accessToken, refreshToken } = await generateTokens(userFound.
-                _id
-            )
-            return res.json(apiLoginResponse(200, "login", { accessToken, refreshToken}))
+            const { accessToken, refreshToken } = await generateTokens(userFound._id)
+            return res.json(apiResponse(200, "login", { accessToken, refreshToken}))
+
     } catch (error) {
        console.log(error);
        
