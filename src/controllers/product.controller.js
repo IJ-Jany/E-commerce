@@ -1,6 +1,7 @@
 import apiResponse from "quick-response"
 import { Product } from "../models/productSchema.model.js"
 import { cloudinaryUpload } from "../services/cloudinary.js"
+import { Inventory } from "../models/inventorySchema.model.js"
 
 const createProduct = async (req,res)=>{
 try {
@@ -59,4 +60,42 @@ return res.json(apiResponse(400, "thumbnail is required"))
 }
 }
 
-export {createProduct}
+const deleteProduct= async (req,res)=>{
+   try{
+      const{id} = req.params
+      await Inventory.deleteMany({product:id})
+      await Product.findByIdAndDelete({_id:id})
+      res.json("delete")
+   }catch (error){
+      console.log(error);
+      
+   }
+}
+
+const pagination = async (req,res)=>{
+   try {
+      const {page,limit} = req.query
+      let filter = {}
+      let currentPage = 1
+      if(page < 1){
+      const baseLimit = limit || 2
+      const skip = Number(((currentPage - 1) * baseLimit))
+      const products = await Product.find().skip(skip).limit(baseLimit)
+      const totalProducts = await Product.countDocuments()
+      const totalPages = Math.ceil((totalProducts / baseLimit)) 
+      res.json({products, totalProducts, totalPages,baseLimit,currentPage})
+     
+       }else{
+         currentPage = Number(page || 1)
+         const baseLimit = limit || 2
+         const skip = Number(((currentPage - 1) * baseLimit))
+         const products = await Product.find().skip(skip).limit(baseLimit)
+         const totalProducts = await Product.countDocuments()
+         const totalPages = Math.ceil((totalProducts / baseLimit)) 
+         res.json({products, totalProducts, totalPages,baseLimit,currentPage})
+       }} catch (error) {
+      
+   }
+}
+
+export {createProduct, pagination}
