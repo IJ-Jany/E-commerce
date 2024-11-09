@@ -19,6 +19,9 @@ const inventorySchema = new Schema({
       type:String,
       enum: ["amount", "parcentage"]
     },
+   },
+   quantity: {
+    type: Number
    }
 },{ timestamps:true})
 

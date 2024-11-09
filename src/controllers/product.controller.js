@@ -22,16 +22,37 @@ return res.json(apiResponse(400, "thumbnail is required"))
     }
     newSlug = slug.replaceAll(" ","-").toLowerCase() + "-" +  Date.now()
    }
-   const {path} = thumbnail[0 ]
+   const {path} = thumbnail[0]
    const result = await cloudinaryUpload(path, slug, "product")
+
    const product = new Product()
+   if(req.files?.gallery){
+      let public_id
+      const {gallery} = req.files
+      const galleryImages = gallery.map((item)=> item)
+
+      for (let image of galleryImages){
+         public_id = image.fieldename + Date.now() + '-' + Math.round(Math.random() *  1E9)
+         const uploadGalleryImage = await cloudinaryUpload(
+            image.path,
+            public_id,
+            'product/gallery'
+         )
+         product.gallery.push({
+            imagePath: uploadGalleryImage.optimizeUrl,
+            public_id: public_id,
+         })
+      }
+   }
+
+
    product.title= title
    product.category= category
    product.subcategory = subcategory 
    product.thumbnail.imgPath= result.optimizeUrl
    product.thumbnail.public_id = result.uploadResult.public_id
    await product.save()
-res.json(apiResponse(201, "product created", {product}))
+ res.json(apiResponse(201, "product created", {product}))
 } catch (error) {
    console.log(error);
     
