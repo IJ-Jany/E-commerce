@@ -8,10 +8,9 @@ const SubCategorySchema = new Schema({
     },
     slug:{
         type:String,
-        unique: true,
-        require:true
+        unique: true
     },
-    subCategory: {
+    category: {
         type:mongoose.Types.ObjectId,
         ref: "Category"
     }

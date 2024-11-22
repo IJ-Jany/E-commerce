@@ -1,9 +1,20 @@
 import mongoose, { Schema } from "mongoose";
 const variationSchema = new Schema({
-    name:{
+   size:{
+    Sizename: {
         type: String
-    }
-},{timestamps})
+    },
+    category: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: 'Category'
+        }
+    ]
+   },
+   color: {
+    type: String
+   },
+},{timestamps: true})
 
-const Variation = mongoose.model("Variation", variationSchema)
+export const Variation = mongoose.model("Variation", variationSchema)
 

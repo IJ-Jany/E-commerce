@@ -20,18 +20,23 @@ console.log(error);
     }
 }
  const createUser = async (req,res)=>{
+    const {displayname,email,password,phonenumber,role} = req.body
     try {
-        const {displayname,email,password,phonenumber} = req.body
  const isFound = await  User.findOne({email})
+
 if (isFound) {
  return  res.send("email already exist")
 }
-const user = await User.create({displayname,password,email,phonenumber})
-console.log(user);
+let user
+if(role){
+     user = await User.create({displayname,password,email,phonenumber,role})
+}else{
+     user = await User.create({displayname,password,email,phonenumber})
+}
 
 const link = await user.generateAccessToken(user._id)
 await mail(user.email,"verification","hello",verificationTemplate(link))
- return res.send("ok")
+ return res.send(apiResponse(201, "user created",user))
  
 } 
  catch (error) {
@@ -73,27 +78,30 @@ const  login = async(req,res)=>{
         
         if (req.body.hasOwnProperty("email") && req.body.hasOwnProperty("password")) {
             if([email,password ].some((field) => field == "")){
-                return res.json("all fields are required")
+                return res.json(apiResponse(401,"all fields are required"))
               }
+           }else{
+            return res.json(apiResponse(401,"all fields are required"))
            }
            const userFound = await User.findOne({ email})
            console.log(userFound);
            
            if (!userFound) {
-            return res.send("email and password wrong")
+            return res.json(apiResponse(500,"email and password wrong"))
            }
            //const isPasswordCorrect = await userFound.checkPassword(password)
            const isPasswordCorrect = await userFound.checkPassword(password)
           console.log(isPasswordCorrect);
            
             if (!isPasswordCorrect) {
-                return res.send("email and password wrong")
+                return res.json(apiResponse(500,"email and password wrong"))
             }
             if(!userFound.emailVerified){
-             return res.send("email not verified, please check your mailbox")
+             return res.json(apiResponse(500,"email not verified, please check your mailbox"))
             }
+            const user = await User.findById({_id:userFound._id}).select("password")
             const { accessToken, refreshToken } = await generateTokens(userFound._id)
-            return res.json(apiResponse(200, "login", { accessToken, refreshToken}))
+            return res.json(apiResponse(200, "login", {user, accessToken, refreshToken}))
 
     } catch (error) {
        console.log(error);
@@ -123,9 +131,10 @@ if(req.file){
 }
 const logout = async (req,res) => {
     try {
-        const user = await user.findById(req.user.id)
+        const user = await User.findById(req.user.id)
         user.refreshToken = null
         await user.save()
+        return res.json(apiResponse(200, "Logout successfully done"))
     } catch (error) {
         console.log(error)
     }

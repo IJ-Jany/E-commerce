@@ -1,9 +1,8 @@
 import apiResponse from "quick-response"
-import {  } from "../models/categorySchema.js"
-import { SubCategory } from "../models/subCategorySchema.js"
-import { Category } from "../models/categorySchema.js"
+import { SubCategory } from "../models/subCategorySchema.model.js"
+import { Category } from "../models/categorySchema.model.js"
 
-export  const subCategoryCreate = async(req,res)=>{
+ const subCategoryCreate = async(req,res)=>{
 try {
     let newSlug
     const {name, slug, category} = req.body

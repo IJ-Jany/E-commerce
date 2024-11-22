@@ -7,7 +7,7 @@ import { adminAuth } from "../middlewares/adminauth.middleware.js";
 const router = e.Router()
 
 
-router.route('/user/create').post(validation, createUser)
+router.route('/user/create').post( createUser)
 router.route('/user/:link').get(emailVerify)
 router.route("/user/logout").post(auth, logout)
 router.route("/user/update").post(auth, upload.single("profilepic"), userUpdate)

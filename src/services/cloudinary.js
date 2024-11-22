@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import {unlinkSync} from "fs"
+import { unlinkSync} from 'fs'
 
 
     // Configuration
@@ -17,11 +17,15 @@ import {unlinkSync} from "fs"
              folder
          }
      )
+    
+     
      unlinkSync(path)
   } catch (error) {
+ 
+     
     unlinkSync(path)
-    console.error("Upload Error", error);
-    return {error: 'Upload failed' , uploadResult:null};
+   
+    return res.json({message:'upload failed', uploadResult:null})
   }
       
   // Optimize delivery by resizing and applying auto-format and auto-quality
@@ -29,8 +33,6 @@ import {unlinkSync} from "fs"
       fetch_format: 'auto',
       quality: 'auto'
   });
-  
-  console.log(optimizeUrl);
   
   // Transform the image: auto-crop to square aspect_ratio
   const autoCropUrl = cloudinary.url(uploadResult.public_id, {
@@ -40,6 +42,6 @@ import {unlinkSync} from "fs"
       height: 500,
   });
   
- return (optimizeUrl, autoCropUrl, uploadResult)
+ return {optimizeUrl, autoCropUrl, uploadResult}
 
     }

@@ -1,7 +1,7 @@
 import apiResponse from "quick-response"
-import { Category } from "../models/categorySchema.js"
+import { Category } from "../models/categorySchema.model.js"
 
-export  const categoryCreate = async(req,res)=>{
+  const categoryCreate = async(req,res)=>{
 try {
     let newSlug
     const {name, slug} = req.body
@@ -16,7 +16,14 @@ try {
     const category = await Category.create({name, slug:newSlug})
     return res.json(apiResponse(201, "category created",{category}))
 } catch (error) {
-    console.log(error);
+    console.log(error.message);
     
 }
 }
+
+const getCategory= async(_,res)=>{
+  const categories = await Category.find()
+  return res.json(apiResponse(200,"categories", categories))
+}
+
+export {categoryCreate, getCategory}
