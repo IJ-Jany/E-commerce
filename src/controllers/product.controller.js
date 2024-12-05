@@ -8,7 +8,7 @@ const createProduct = async (req,res)=>{
 try {
    const {title,slug,category,subcategory}  = req.body
    const {thumbnail,gallery} = req.files
-
+let imagepath = thumbnail[0].path
    
    
      
@@ -24,23 +24,24 @@ return res.json(apiResponse(400, "thumbnail is required"))
    }else{
     const isSlugUnique = await Product.find({ slug})
     if(isSlugUnique){
-        return res.json(apiResponse(400, "slug must be ubique"))
+        return res.json(apiResponse(400, "slug must be unique"))
     }
     newSlug = slug.replaceAll(" ","-").toLowerCase() + "-" +  Date.now()
    }
    const {path} = thumbnail[0]
    
    
-   const result = await cloudinaryUpload(path, slug, "product")
+   const result = await cloudinaryUpload(imagepath, slug, "product")
 
   
    const product = new Product()
    if(req.files?.gallery){
-      let publicId
+      let publicId = ""
       const {gallery} = req.files
+   const galleryimage = gallery.map((path)=>path.path)
 
 
-      for (let image of gallery) {
+      for (let image of galleryimage) {
          publicId = image.filename + Date.now() + '-' + Math.round(Math.random() * 1E9)
    const uploadedGalleryImage = await cloudinaryUpload(
            image.path,
@@ -60,7 +61,7 @@ return res.json(apiResponse(400, "thumbnail is required"))
    product.thumbnail.imagePath= result.optimizeUrl
    product.thumbnail.public_id = result.uploadResult.public_id
    await product.save()
- res.json(apiResponse(201, "product created", {product}))
+ return res.json(apiResponse(201, "product created", {product}))
 } catch (error) {
    console.log(error);
     

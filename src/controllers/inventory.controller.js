@@ -59,6 +59,19 @@ const createInventory = async (req,res)=>{
             }
             }
 
+            const inventoryById = async (req,res)=>{
+                const {id} = req.params
+                try {
+    
+                    const inventory = await Inventory.find({_id: id }).populate("product").populate("variation")
+    
+                    return res.json(apiResponse(200, "Inventory list", {inventory}))
+                } catch (error) {
+                   console.log("i", error);
+                    
+                }
+                }
+
             const deleteById = async (req,res)=>{
                 try {
                     const {id} = req.params
@@ -70,4 +83,4 @@ const createInventory = async (req,res)=>{
                 }
                 }
     
-    export {createInventory,updateInventory,allInventory,deleteById}
+    export {createInventory,updateInventory,allInventory,deleteById,inventoryById }

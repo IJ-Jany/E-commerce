@@ -26,11 +26,11 @@ const productsSchema = new Schema({
     thumbnail:{
         public_id:{
             type:String,
-            required:true 
+           // required:true 
         },
         imagePath:{
             type:String,
-            required:true  
+          //  required:true  
         }
     },
     gallery: [

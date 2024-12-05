@@ -25,7 +25,7 @@ try {
 
 const allSubCategories = async (req,res) =>{
     try {
-        const data = await SubCategory.find().populate("subCategory")
+        const data = await SubCategory.find({}).populate("category")
         return res.json(apiResponse(200, "all subcategories", {data} ))
     } catch (error) {
         

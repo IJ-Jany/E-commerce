@@ -3,7 +3,6 @@
  import { mail } from "../utils/sendMail.js"
 import { verificationTemplate } from "../mailTemp/verificationTemplate.js"
 import { cloudinaryUpload } from "../services/cloudinary.js"
-import ApiResponse from "../utils/ApiResponse.js"
 import apiResponse from "quick-response"
 
 const generateTokens = async (id) => {
@@ -99,7 +98,7 @@ const  login = async(req,res)=>{
             if(!userFound.emailVerified){
              return res.json(apiResponse(500,"email not verified, please check your mailbox"))
             }
-            const user = await User.findById({_id:userFound._id}).select("password")
+            const user = await User.findById({_id:userFound._id}).select("-password")
             const { accessToken, refreshToken } = await generateTokens(userFound._id)
             return res.json(apiResponse(200, "login", {user, accessToken, refreshToken}))
 
@@ -139,5 +138,17 @@ const logout = async (req,res) => {
         console.log(error)
     }
 }
+const getUser = async (req,res) => {
+   try {
+    const { id } = req.params
+    const user = await User.findById({_id:id}).select("-password,-refreshToken")
+    console.log(user);
+    
+    return res.json(apiResponse(200, "user details",user ))
+   } catch (error) {
+    console.log(error);
+    
+   }
+}
 
-export {createUser,emailVerify, login, logout, userUpdate}
+export {createUser,emailVerify, login, logout, userUpdate,getUser}

@@ -7,7 +7,7 @@ import { createProduct ,deleteProduct, pagination} from "../controllers/product.
 const router = e.Router()
 
 
-router.route("/product/create").post(upload.fields([{ name: 'thumbnail', maxCount: 1}, {name: 'gallery', maxCount: 4}]),createProduct)
+router.route("/product/create").post(upload.single('thumbnail'), upload.array('gallery'),createProduct)
 router.route("/product/delete/:id").delete(deleteProduct)
 router.route("/product").get(pagination)
 
