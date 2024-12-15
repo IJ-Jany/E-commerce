@@ -70,6 +70,13 @@ const emailVerify = async (req,res) =>{
 }
 } 
 
+ const resendEmail = async (req,res) =>{
+    const {email} = req.body
+    const user = await user.findOne({email})
+    const link = await user.generateAccessToken()
+    await mail(user.email,"verification","hello",verificationTemplate(link))
+ }
+
 const  login = async(req,res)=>{
     try {
         const {email,password} =req.body 
@@ -151,4 +158,4 @@ const getUser = async (req,res) => {
    }
 }
 
-export {createUser,emailVerify, login, logout, userUpdate,getUser}
+export {createUser,emailVerify, login, logout, userUpdate,getUser, resendEmail}

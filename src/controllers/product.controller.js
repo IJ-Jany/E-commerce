@@ -2,6 +2,8 @@ import apiResponse from "quick-response"
 import { Product } from "../models/productSchema.model.js"
 import { cloudinaryUpload } from "../services/cloudinary.js"
 import { Inventory } from "../models/inventorySchema.model.js"
+import { Category } from "../models/categorySchema.model.js"
+import { SubCategory } from "../models/subCategorySchema.model.js"
 //import { Promise } from "mongoose"
 
 const createProduct = async (req,res)=>{
@@ -9,6 +11,8 @@ try {
    const {title,slug,category,subcategory}  = req.body
    const {thumbnail,gallery} = req.files
 let imagepath = thumbnail[0].path
+console.log(thumbnail, "gallry found");
+
    
    
      
@@ -28,7 +32,7 @@ return res.json(apiResponse(400, "thumbnail is required"))
     }
     newSlug = slug.replaceAll(" ","-").toLowerCase() + "-" +  Date.now()
    }
-   const {path} = thumbnail[0]
+  
    
    
    const result = await cloudinaryUpload(imagepath, slug, "product")
@@ -44,7 +48,7 @@ return res.json(apiResponse(400, "thumbnail is required"))
       for (let image of galleryimage) {
          publicId = image.filename + Date.now() + '-' + Math.round(Math.random() * 1E9)
    const uploadedGalleryImage = await cloudinaryUpload(
-           image.path,
+           image,
            publicId,
             'product/gallery'
             )
@@ -142,4 +146,20 @@ const pagination = async (req,res)=>{
    }
 }
 
-export {createProduct, pagination, deleteProduct}
+const getProducts=async (req,res)=>{
+   try {
+      const products = await Product.find()
+      return res.json(products)
+   } catch (error) {
+      console.log(error)
+   }
+
+}
+
+const singleProduct = async (req,res) => {
+   const {slug} = req.params
+   const product = await Product.findOne({slug}).populate(`category`).populate(`subcategory`).populate(`inventory`)
+   return res.json({product})
+}
+
+export {createProduct, pagination, deleteProduct,getProducts,singleProduct}
